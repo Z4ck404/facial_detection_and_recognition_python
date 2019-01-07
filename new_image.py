@@ -13,8 +13,8 @@ p = "shape_predictor_68_face_landmarks.dat"
 detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor(p)
 #construct your numpy array of data
-image_file = sys.argv[1]
-image = cv2.imread(image_file)
+#image_file = sys.argv[1]
+#image = cv2.imread(image_file)
 #the function to extract  the 2346 features from a photo :
 #the pattern I ll be using to store the data :
 #data = [{'a': 1, 'b': 2},{'a': 5, 'b': 10, 'c': 20}]
@@ -48,9 +48,9 @@ def load_image(folder_name):
     cv2.imshow("Output", image)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
-def extract_test(img):
+def extract_test(shap):
     #img = cv2.imread(path)
-    shap = detect_face(img)
+    #shap = detect_face(img)
     vect = {}
     d = 1
     for i in range (0,68):
@@ -122,6 +122,12 @@ def predict_with_model(vect):
     y = model.loc[:,['name']].values
     logisticRegr.fit(x, y)
     return logisticRegr.predict(vect)
+def predict(vect,model):
+    features = list(model.columns.values)[:2346]
+    x = model.loc[:, features].values
+    y = model.loc[:,['name']].values
+    logisticRegr.fit(x, y)
+    return logisticRegr.predict(vect)
 def detect_face(image):
     #image = cv2.imread('new0.png')
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -156,10 +162,10 @@ def draw_img(img,shape):
 #load_image("zakaria")
 #for i in tab :
 #    print(i)
-vect = extract_test(image)
-print (vect)
+#vect = extract_test(image)
+#print (vect)
 #print(train_model())
-print(predict_with_model(vect))
+#print(predict_with_model(vect))
 #print(train_model())
 #path = "/zakaria/1.jpg"
 #img = cv2.imread(path)
@@ -172,5 +178,29 @@ print(predict_with_model(vect))
 #print(apply_pca(s)[0][0])
 #print("len de data without pcs : ",len(s)," ",len(s[0]))
 #print("len de data after applying pca:",len(apply_pca(s)))
+cap = cv2.VideoCapture(0)
+model = train_model()
+print(model)
+while True:
+    _, image = cap.read()
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    rects = detector(gray, 0)
+    for (i, rect) in enumerate(rects):
+        shape = predictor(gray, rect)
+        shape = face_utils.shape_to_np(shape)
+        for (x, y) in shape:
+            cv2.circle(image, (x, y), 2, (0, 255, 0), -1)
+        vect = extract_test(shape)
+        print(predict_with_model(vect))
 
+        '''
+    vect = extract_test(image)
+    print(predict_with_model(vect)) '''
+    cv2.imshow("Output", image)
+    k = cv2.waitKey(5) & 0xFF
+    if k == 27:
+        break
+
+cv2.destroyAllWindows()
+cap.release()
 
