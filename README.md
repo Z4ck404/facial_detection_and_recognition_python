@@ -86,5 +86,36 @@ def extract_feauture(img,name):
 This part consists in implementing the logistic regression to have a face classifier that will make it possible to recognize Zakaria or not in the input images (the input video), but before that we apply the principal component analysis method. to reduce the drive vectors of 2346 components to a minimal number to not slow down the model and make calculations that are not necessary.
 We did not give for the ACP a number of precise components to be output, but to automatically generate the number that keeps 95% of the variance
 ## predict for every frame : photo in the rel time video the value (zakaria or other).
+test the model by typing :
+ ```
+ python new_image [input_image]
+ #or activate uncomment the last part of the code to activate the real time face detection and recognition
+ ```
+  ```
+  cap = cv2.VideoCapture(0)
+model = train_model()
+print(model)
+while True:
+    _, image = cap.read()
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    rects = detector(gray, 0)
+    for (i, rect) in enumerate(rects):
+        shape = predictor(gray, rect)
+        shape = face_utils.shape_to_np(shape)
+        for (x, y) in shape:
+            cv2.circle(image, (x, y), 2, (0, 255, 0), -1)
+        vect = extract_test(shape)
+        print(predict_with_model(vect))
+    
+    vect = extract_test(image)
+    print(predict_with_model(vect)) 
+    cv2.imshow("Output", image)
+    k = cv2.waitKey(5) & 0xFF
+    if k == 27:
+        break
+cv2.destroyAllWindows()
+cap.release()
+  ```
+ 
 ![image](https://user-images.githubusercontent.com/35115877/50806900-88516f00-12f0-11e9-9bae-5f96b7bfd646.png)
 
