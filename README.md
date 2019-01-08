@@ -85,7 +85,7 @@ def extract_feauture(img,name):
 ## train a logistic regression model to cluster the data to "zakaria" and "other".
 This part consists in implementing the logistic regression to have a face classifier that will make it possible to recognize Zakaria or not in the input images (the input video), but before that we apply the principal component analysis method. to reduce the drive vectors of 2346 components to a minimal number to not slow down the model and make calculations that are not necessary.
 We did not give for the ACP a number of precise components to be output, but to automatically generate the number that keeps 95% of the variance
-## predict for every frame : photo in the rel time video the value (zakaria or other).
+## predict for every frame : photo in the real time video the value (zakaria or other).
 test the model by typing :
  ```
  python new_image [input_image]
