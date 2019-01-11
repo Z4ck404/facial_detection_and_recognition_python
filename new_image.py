@@ -53,39 +53,49 @@ def extract_test(shap):
     #shap = detect_face(img)
     vect = {}
     d = 1
-    for i in range (0,68):
-        for j in range (i,68):
+    for i in range (0,66):
+        for j in range (i,66):
             a = numpy.array((shap[i][0] ,shap[i][1]))
             b = numpy.array((shap[j][0] ,shap[j][1]))
+            c = numpy.array((shap[i+1][0] ,shap[i+1][1]))
             #names = names + ["dist"+str(d)]
-            #distances=distances+[numpy.linalg.norm(a-b)] 
-            col = "dist"+str(d)
-            val = numpy.linalg.norm(a-b)
-            vect[col] = val
-            d = d +1
-    #return vect
+            #distances=distances+[numpy.linalg.norm(a-b)]
+            col1 = "dist"+str(d)
+            col2 = "dist"+str(d+1)
+            val1 = numpy.linalg.norm(a-b)
+            val2 = numpy.linalg.norm(a-c)
+            if val1 ==0 or val2 ==0 :
+                continue
+            else :
+                v2 = val1 / val2
+            vect[col1] = val1
+            vect[col2] = v2
+            d = d +2
     ve = pd.DataFrame([vect])
-    #ve = StandardScaler().fit_transform(ve)
-    #pca = PCA(n_components=100)
-    #pca = PCA(.95)
-    #principalComponents = pca.fit_transform(ve)
-    #rst = pd.DataFrame(principalComponents)
     return ve
 def extract_feauture(img,name):
     #img = cv2.imread(path)
     shap = detect_face(img)
     vect = {}
     d = 1
-    for i in range (0,68):
-        for j in range (i,68):
+    for i in range (0,66):
+        for j in range (i,66):
             a = numpy.array((shap[i][0] ,shap[i][1]))
             b = numpy.array((shap[j][0] ,shap[j][1]))
+            c = numpy.array((shap[i+1][0] ,shap[i+1][1]))
             #names = names + ["dist"+str(d)]
-            #distances=distances+[numpy.linalg.norm(a-b)] 
-            col = "dist"+str(d)
-            val = numpy.linalg.norm(a-b)
-            vect[col] = val
-            d = d +1
+            #distances=distances+[numpy.linalg.norm(a-b)]
+            col1 = "dist"+str(d)
+            col2 = "dist"+str(d+1)
+            val1 = numpy.linalg.norm(a-b)
+            val2 = numpy.linalg.norm(a-c)
+            if val1 ==0 or val2 ==0 :
+                continue
+            else :
+                v2 = val1 / val2
+            vect[col1] = val1
+            vect[col2] = v2
+            d = d +2
     vect["name"]= name
     return vect
 #check all the photos in the folder to train the model : 
@@ -98,11 +108,12 @@ def train(folder_name,n):
         image = cv2.imread(path)
         v = extract_feauture(image,folder_name)
         data = data + [v]
+        #print(v)
     return data
 #gather all the extracted data from photos in one data frame : 
 def train_model():
     v1 = train('zakaria',16)
-    v2 = train('other',4)
+    v2 = train('other',9)
     data = v1+v2
     model = pd.DataFrame(data)
     #features = list(model.columns.values)[:2346]
@@ -115,6 +126,13 @@ def train_model():
     #finalDf = pd.concat([rst, model[['name']]], axis = 1)
     return model
 #apply logistic regression and predict who is in the picture :
+def reg_modul(vect):
+    model = train_model()
+    features = list(model.columns.values)[:2346]
+    x = model.loc[:, features].values
+    y = model.loc[:,['name']].values
+    logisticRegr.fit(x, y)
+    return logisticRegr.predict(vect)
 def predict_with_model(vect):
     model = train_model()
     features = list(model.columns.values)[:2346]
@@ -157,6 +175,7 @@ def draw_img(img,shape):
         cv2.imshow("Output", image)
             #k = cv2.waitKey(5) & 0xFF
 #s = detect_face(image)
+#print(reg_modult())
 #tab = extract_feauture(image)
 #print(tab)
 #load_image("zakaria")
@@ -178,9 +197,19 @@ def draw_img(img,shape):
 #print(apply_pca(s)[0][0])
 #print("len de data without pcs : ",len(s)," ",len(s[0]))
 #print("len de data after applying pca:",len(apply_pca(s)))
-cap = cv2.VideoCapture(0)
+'''
 model = train_model()
 print(model)
+'''
+cap = cv2.VideoCapture(0)
+model = train_model()
+#print(model)
+model = train_model()
+features = list(model.columns.values)[:4290]
+x = model.loc[:, features].values
+y = model.loc[:,['name']].values
+print (x)
+logisticRegr.fit(x, y)
 while True:
     _, image = cap.read()
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -191,11 +220,11 @@ while True:
         for (x, y) in shape:
             cv2.circle(image, (x, y), 2, (0, 255, 0), -1)
         vect = extract_test(shape)
-        print(predict_with_model(vect))
+        print(logisticRegr.predict(vect))
 
-        '''
+        
     vect = extract_test(image)
-    print(predict_with_model(vect)) '''
+    print(predict_with_model(vect)) 
     cv2.imshow("Output", image)
     k = cv2.waitKey(5) & 0xFF
     if k == 27:
@@ -203,4 +232,5 @@ while True:
 
 cv2.destroyAllWindows()
 cap.release()
+
 
