@@ -13,7 +13,7 @@ if you face any issue installing dlib in windows , open anaconda prompt and type
 ```
 conda install -c conda-forge dlib=19.4
 ```
-please refer to  [this post](https://www.pyimagesearch.com/2018/06/18/face-recognition-with-opencv-python-and-deep-learning/?fbclid=IwAR04-Jlms00beR73fMR_KWza8UoIa68XlyCwT7tKKxIL4o1_oPuD6uPSqsE).
+please refer to  [this post](https://www.pyimagesearch.com/2018/06/18/face-recognition-with-opencv-python-and-deep-learning/?fbclid=IwAR04-Jlms00beR73fMR_KWza8UoIa68XlyCwT7tKKxIL4o1_oPuD6uPSqsE) for more information.
 # Features extraction : 
 use open cv to detect 
 ```
